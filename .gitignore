@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local environment
+.env
+
+# Generated output
+roster_output.txt
