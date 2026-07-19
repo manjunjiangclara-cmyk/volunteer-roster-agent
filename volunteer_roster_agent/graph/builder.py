@@ -1,12 +1,9 @@
 from langgraph.graph import END, START, StateGraph
 
-from volunteer_roster_agent.graph.nodes import (
-    apply_system_messages,
-    apply_volunteer_leave_messages,
-    classify_messages,
-    review_roster,
-)
+from volunteer_roster_agent.graph.classification import classify_messages
 from volunteer_roster_agent.graph.preparation import prepare_roster
+from volunteer_roster_agent.graph.requirements import apply_roster_requirements
+from volunteer_roster_agent.graph.scheduling import solve_roster
 from volunteer_roster_agent.graph.state import RosterState
 
 # Node names in pipeline order, exposed so callers can stop the graph early
@@ -15,9 +12,8 @@ from volunteer_roster_agent.graph.state import RosterState
 NODE_ORDER = [
     "prepare_roster",
     "classify_messages",
-    "apply_system_messages",
-    "apply_volunteer_leave_messages",
-    "review_roster",
+    "apply_roster_requirements",
+    "solve_roster",
 ]
 
 
@@ -32,16 +28,14 @@ def build_roster_graph(*, stop_after: str | None = None):
 
     builder.add_node("prepare_roster", prepare_roster)
     builder.add_node("classify_messages", classify_messages)
-    builder.add_node("apply_system_messages", apply_system_messages)
-    builder.add_node("apply_volunteer_leave_messages", apply_volunteer_leave_messages)
-    builder.add_node("review_roster", review_roster)
+    builder.add_node("apply_roster_requirements", apply_roster_requirements)
+    builder.add_node("solve_roster", solve_roster)
 
     builder.add_edge(START, "prepare_roster")
     builder.add_edge("prepare_roster", "classify_messages")
-    builder.add_edge("classify_messages", "apply_system_messages")
-    builder.add_edge("apply_system_messages", "apply_volunteer_leave_messages")
-    builder.add_edge("apply_volunteer_leave_messages", "review_roster")
-    builder.add_edge("review_roster", END)
+    builder.add_edge("classify_messages", "apply_roster_requirements")
+    builder.add_edge("apply_roster_requirements", "solve_roster")
+    builder.add_edge("solve_roster", END)
 
     interrupt_before = None
     if stop_after is not None:

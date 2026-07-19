@@ -2,7 +2,15 @@ from datetime import date
 
 import pytest
 
-from volunteer_roster_agent.models import DayOfWeek, Shift, Slot, TimeSlot
+from volunteer_roster_agent.models import (
+    Confidence,
+    DayOfWeek,
+    Shift,
+    Slot,
+    TimeSlot,
+    VolunteerRequest,
+    VolunteerRequestType,
+)
 
 
 def test_shift_accepts_date_matching_slot_day_of_week() -> None:
@@ -38,3 +46,16 @@ def test_shift_with_assignment_tracks_volunteers() -> None:
     updated = shift.with_assignment("v1")
     assert updated.assigned_volunteer_ids == ("v1",)
     assert shift.assigned_volunteer_ids == ()
+
+
+def test_incomplete_leave_request_requires_confirmation() -> None:
+    request = VolunteerRequest(
+        employee="Alice",
+        date=None,
+        shift=TimeSlot.EVENING,
+        request_type=VolunteerRequestType.LEAVE,
+        confidence=Confidence.MEDIUM,
+        needs_confirmation=False,
+    )
+
+    assert request.needs_confirmation is True

@@ -3,7 +3,7 @@ from datetime import date
 from typing_extensions import NotRequired, TypedDict
 
 from volunteer_roster_agent.models import (
-    RosterRequest,
+    ClassifiedMessage,
     Shift,
     Slot,
     SystemMessage,
@@ -24,4 +24,4 @@ class RosterState(TypedDict):
     month: int
     year: int
     reference_date: NotRequired[date]
-    classified_messages: NotRequired[list[RosterRequest]]
+    classified_messages: NotRequired[list[ClassifiedMessage]]
